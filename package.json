@@ -8,6 +8,7 @@
       "license": "MIT"
     }
   ],
+  "bin": "bin/fetch-github-dependents",
   "scripts": {
     "build": "tsup-node",
     "start-old": "node --loader ts-node/esm ./src/index.ts",
