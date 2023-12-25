@@ -1,15 +1,30 @@
 {
-  "name": "@ilimic/github-sort-dependents-by-stars",
+  "name": "@ilimic/fetch-github-dependents",
   "version": "1.0.0-alpha.0",
   "description": "Get Github project dependents and sort them by stars.",
-  "main": "",
+  "type": "module",
+  "licenses": [
+    {
+      "license": "MIT"
+    }
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup-node",
+    "start-old": "node --loader ts-node/esm ./src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsup-node --watch"
   },
   "author": "Ivo Limić <ilimic1@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
-  }
+    "tsup": "^8.0.1"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "commander": "^11.1.0"
+  },
+  "files": [
+    "dist"
+  ]
 }
