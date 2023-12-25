@@ -54,7 +54,7 @@ program
   )
   .option("--no-sort", "disable default sorting by stars")
   .action(async (repo, options) => {
-    console.log(repo, options);
+    console.log(`Fetching dependents for ${repo} ...`);
 
     const max = options.max ? parseInt(options.max) : undefined;
 
