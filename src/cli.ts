@@ -9,7 +9,7 @@ const program = new Command();
 program
   .name("github-dependents")
   .description("CLI to fetch GitHub dependents and sort by stars.")
-  .version("1.0.0-alpha.0");
+  .version("1.0.0-alpha.3");
 
 program
   .command("fetch", { isDefault: true })
