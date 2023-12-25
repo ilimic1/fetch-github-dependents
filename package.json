@@ -8,7 +8,7 @@
       "license": "MIT"
     }
   ],
-  "bin": "bin/fetch-github-dependents",
+  "bin": "bin/fetch-github-dependents.js",
   "scripts": {
     "build": "tsup-node",
     "prepublish": "npm run build",
