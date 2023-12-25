@@ -11,6 +11,7 @@
   "bin": "bin/fetch-github-dependents",
   "scripts": {
     "build": "tsup-node",
+    "prepublish": "npm run build",
     "start-old": "node --loader ts-node/esm ./src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsup-node --watch"
