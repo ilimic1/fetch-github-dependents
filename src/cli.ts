@@ -1,6 +1,7 @@
 #!/bin/env node
 
 import { Command, InvalidArgumentError, Option } from "commander";
+import { trimEnd } from "lodash-es";
 import { getRepos } from "./index.js";
 
 const program = new Command();
@@ -15,7 +16,25 @@ program
   .description("Fetch dependents from GitHub")
   .argument(
     "<repo>",
-    "repo url, eg. https://github.com/ilimic1/github-dependents"
+    "repo url, eg. https://github.com/ilimic1/github-dependents",
+    (value) => {
+      const urlRegex =
+        /^(?:https?\:\/\/)github.com\/[A-Za-z0-9-]+\/[A-Za-z0-9-]+\/?/i;
+
+      const userRepoRegex = /^[A-Za-z0-9-]+\/[A-Za-z0-9-]+$/i;
+
+      if (urlRegex.test(value)) {
+        return trimEnd(value, "/");
+      }
+
+      if (userRepoRegex.test(value)) {
+        return `https://github.com/${value}`;
+      }
+
+      throw new InvalidArgumentError(
+        "Repo must be a valid HTTP GitHub repo URL or a user/repo string."
+      );
+    }
   )
   .option(
     "-m, --max <count>",
