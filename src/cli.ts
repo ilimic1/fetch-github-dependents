@@ -2,6 +2,7 @@
 
 import { Command, InvalidArgumentError, Option } from "commander";
 import { trimEnd } from "lodash-es";
+import { version } from "../package.json";
 import { getRepos } from "./index.js";
 
 const program = new Command();
@@ -9,7 +10,7 @@ const program = new Command();
 program
   .name("github-dependents")
   .description("CLI to fetch GitHub dependents and sort by stars.")
-  .version("1.0.0-alpha.4");
+  .version(version);
 
 program
   .command("fetch", { isDefault: true })
