@@ -1,7 +1,8 @@
 {
   "name": "@ilimic/fetch-github-dependents",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "Get Github project dependents and sort them by stars.",
+  "homepage": "https://github.com/ilimic1/fetch-github-dependents",
   "type": "module",
   "licenses": [
     {
