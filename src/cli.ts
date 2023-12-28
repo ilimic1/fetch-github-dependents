@@ -3,7 +3,7 @@
 import { Command, InvalidArgumentError, Option } from "commander";
 import { trimEnd } from "lodash-es";
 import { version } from "../package.json";
-import { getRepos } from "./index.js";
+import { getRepos, githubRepoSlugRegex, githubUserSlugRegex } from "./index.js";
 
 const program = new Command();
 
@@ -22,13 +22,13 @@ program
       const urlRegex =
         /^(?:https?\:\/\/)github.com\/[A-Za-z0-9-]+\/[A-Za-z0-9-]+\/?/i;
 
-      const userRepoRegex = /^[A-Za-z0-9-]+\/[A-Za-z0-9-]+$/i;
-
       if (urlRegex.test(value)) {
         return trimEnd(value, "/");
       }
 
-      if (userRepoRegex.test(value)) {
+      const [user, repo] = value.split("/");
+
+      if (githubUserSlugRegex.test(user) && githubRepoSlugRegex.test(repo)) {
         return `https://github.com/${value}`;
       }
 

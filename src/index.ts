@@ -13,6 +13,8 @@ class Repo {
   }
 }
 
+export const githubUserSlugRegex = /^[A-Za-z0-9-]+$/i;
+export const githubRepoSlugRegex = /^[A-Za-z0-9-_\.]+$/;
 
 async function getData(
   url: string,
