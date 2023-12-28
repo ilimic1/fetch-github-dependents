@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
     "vitest": "^1.1.0"
   },
   "dependencies": {
