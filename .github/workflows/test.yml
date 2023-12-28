@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+  schedule:
+    # every Friday at 08:21:00 eg. 2023-12-29 08:21:00 UTC
+    - cron: "21 8 * * 5"
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version: [20]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: "package-lock.json"
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Run tests
+        run: npm test
