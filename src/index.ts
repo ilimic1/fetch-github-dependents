@@ -13,22 +13,51 @@ class Repo {
   }
 }
 
-async function getRepos_(url: string, reposToScan?: number): Promise<Repo[]> {
+
+async function getData(
+  url: string,
+  reposToScan?: number
+): Promise<{ repos: Repo[]; count: number }> {
   const repos: Repo[] = [];
   let repoCount: number = undefined;
+  let delay = 0;
 
   do {
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    delay = 0;
+
     let data: string;
 
     try {
-      const request = await axios.get(url, {});
+      const request = await axios.get(url);
       data = await request.data;
     } catch (error) {
-      if (error.response) {
-        console.log("Error response status", error.response.status);
+      if (error.response && error.response.status === 429) {
+        // if we get HTTP 429 Too Many Requests we should sleep for a while
+        console.log("error.response.status", error.response.status);
+        console.log("error.response.headers", error.response.headers);
+
+        if (
+          error.response.headers["retry-after"] &&
+          /^[0-9]+$/.test(error.response.headers["retry-after"])
+        ) {
+          delay = Number(error.response.headers["retry-after"]) * 1000;
+        } else {
+          // default to 5 minutes
+          delay = 5 * 60 * 1000;
+        }
+
+        console.log(
+          `Got HTTP 429 Too Many Requests, sleeping for ${
+            delay / 1000
+          } seconds...`
+        );
+
+        continue;
       }
-      console.log("Error", error.message);
-      return repos;
+
+      console.log("error.message", error.message);
+      return { repos, count: repoCount };
     }
 
     const $ = load(data);
@@ -69,26 +98,27 @@ async function getRepos_(url: string, reposToScan?: number): Promise<Repo[]> {
 
       if (reposToScan !== undefined && repos.length >= reposToScan) {
         console.log(`Went through ${repos.length}/${repoCount} repos...`);
-        return repos;
+        return { repos, count: repoCount };
       }
     }
 
     const nextLink = $(
       '.paginate-container .btn.BtnGroup-item:contains("Next")'
     ).eq(0);
+
     url = nextLink.length ? nextLink.attr("href") : null;
     console.log(`Went through ${repos.length}/${repoCount} repos...`);
   } while (url);
 
-  return repos;
+  return { repos, count: repoCount };
 }
 
 export async function getRepos(
   url: string,
   reposToScan: number = undefined,
   sort: undefined | "asc" | "desc"
-): Promise<Repo[]> {
-  const repos = await getRepos_(url, reposToScan);
+): Promise<{ repos: Repo[]; count: number }> {
+  const { repos, count } = await getData(url, reposToScan);
 
   // todo: sort by name as tie braker
   if (sort === "desc") {
@@ -97,5 +127,5 @@ export async function getRepos(
     repos.sort((a, b) => a.stars - b.stars);
   }
 
-  return repos;
+  return { repos, count };
 }
