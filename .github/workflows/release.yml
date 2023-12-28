@@ -16,11 +16,8 @@ jobs:
           cache: "npm"
           cache-dependency-path: "package-lock.json"
 
-      - uses: cschleiden/replace-tokens@v1
-        with:
-          files: "medusa-plugin-bundles/.yarnrc.yml"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install dependencies
+        run: npm i
 
       - run: npm publish
         env:
