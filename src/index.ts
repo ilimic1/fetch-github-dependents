@@ -37,7 +37,7 @@ async function getData(
       if (error.response && error.response.status === 429) {
         // if we get HTTP 429 Too Many Requests we should sleep for a while
         console.log("error.response.status", error.response.status);
-        console.log("error.response.headers", error.response.headers);
+        // console.log("error.response.headers", error.response.headers);
 
         if (
           error.response.headers["retry-after"] &&
