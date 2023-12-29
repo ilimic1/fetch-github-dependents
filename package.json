@@ -4,6 +4,14 @@
   "description": "Get Github project dependents and sort them by stars.",
   "homepage": "https://github.com/ilimic1/fetch-github-dependents",
   "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "licenses": [
     {
       "license": "MIT"
