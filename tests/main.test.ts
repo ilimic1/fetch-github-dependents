@@ -26,6 +26,29 @@ test(
   1 * 60 * 1000
 );
 
+test(
+  "Test a repo with one dependent",
+  async () => {
+    const repo = "https://github.com/ilimic1/fetch-github-dependents";
+    const reposToScan = 100;
+    const sort = "desc";
+
+    // console.log(`Fetching dependents for ${repo} ...`);
+
+    const { repos, count } = await getRepos(
+      `${repo}/network/dependents`,
+      reposToScan,
+      sort
+    );
+
+    expect(count).toBe(1);
+    expect(repos.length).toBe(1);
+  },
+  1 * 60 * 1000
+);
+
+test(
+  "Test should return no empty repos",
   async () => {
     const repo = "https://github.com/cheeriojs/cheerio";
     const reposToScan = 2000;
