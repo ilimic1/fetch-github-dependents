@@ -27,7 +27,7 @@ test(
 );
 
 test(
-  "Test a repo with one dependent",
+  "Test a repo with at least one known dependent",
   async () => {
     const repo = "https://github.com/ilimic1/fetch-github-dependents";
     const reposToScan = 100;
@@ -41,8 +41,22 @@ test(
       sort
     );
 
-    expect(count).toBe(1);
-    expect(repos.length).toBe(1);
+    expect(count).toBeGreaterThanOrEqual(1);
+    expect(repos.length).toBeGreaterThanOrEqual(1);
+
+    const dependentRepo = repos.find(
+      (repo) =>
+        repo.getUrl() ===
+        "https://github.com/ilimic1/fetch-github-dependents-test"
+    );
+
+    expect(dependentRepo).toBeDefined();
+    expect(dependentRepo.user).toBe("ilimic1");
+    expect(dependentRepo.repo).toBe("fetch-github-dependents-test");
+    expect(dependentRepo.getUrl()).toBe(
+      "https://github.com/ilimic1/fetch-github-dependents-test"
+    );
+    expect(dependentRepo.stars).toBeGreaterThanOrEqual(1);
   },
   1 * 60 * 1000
 );
