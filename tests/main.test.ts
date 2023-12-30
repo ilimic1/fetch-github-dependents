@@ -6,7 +6,26 @@ import {
 } from "../src/index.js";
 
 test(
-  "@ilimic/fetch-github-dependents should return no empty repos",
+  "Test a repo with no dependents",
+  async () => {
+    const repo = "https://github.com/ilimic1/fetch-github-dependents-test";
+    const reposToScan = 100;
+    const sort = "desc";
+
+    // console.log(`Fetching dependents for ${repo} ...`);
+
+    const { repos, count } = await getRepos(
+      `${repo}/network/dependents`,
+      reposToScan,
+      sort
+    );
+
+    expect(count).toBe(0);
+    expect(repos.length).toBe(0);
+  },
+  1 * 60 * 1000
+);
+
   async () => {
     const repo = "https://github.com/cheeriojs/cheerio";
     const reposToScan = 2000;
