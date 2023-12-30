@@ -70,7 +70,11 @@ program
       sort = undefined;
     }
 
-    const { repos } = await getRepos(`${repo}/network/dependents`, max, sort);
+    const { repos } = await getRepos({
+      url: `${repo}/network/dependents`,
+      reposToScan: max,
+      sort,
+    });
 
     repos.forEach((repo) => {
       console.log(`${repo.getUrl()} ${repo.stars}`);

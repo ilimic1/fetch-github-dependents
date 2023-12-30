@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import {
+  Repo,
   getRepos,
   githubRepoSlugRegex,
   githubUserSlugRegex,
@@ -14,11 +15,11 @@ test(
 
     // console.log(`Fetching dependents for ${repo} ...`);
 
-    const { repos, count } = await getRepos(
-      `${repo}/network/dependents`,
+    const { repos, count } = await getRepos({
+      url: `${repo}/network/dependents`,
       reposToScan,
-      sort
-    );
+      sort,
+    });
 
     expect(count).toBe(0);
     expect(repos.length).toBe(0);
@@ -35,11 +36,11 @@ test(
 
     // console.log(`Fetching dependents for ${repo} ...`);
 
-    const { repos, count } = await getRepos(
-      `${repo}/network/dependents`,
+    const { repos, count } = await getRepos({
+      url: `${repo}/network/dependents`,
       reposToScan,
-      sort
-    );
+      sort,
+    });
 
     expect(count).toBeGreaterThanOrEqual(1);
     expect(repos.length).toBeGreaterThanOrEqual(1);
@@ -51,12 +52,13 @@ test(
     );
 
     expect(dependentRepo).toBeDefined();
-    expect(dependentRepo.user).toBe("ilimic1");
-    expect(dependentRepo.repo).toBe("fetch-github-dependents-test");
-    expect(dependentRepo.getUrl()).toBe(
+    expect(dependentRepo).toBeInstanceOf(Repo);
+    expect(dependentRepo!.user).toBe("ilimic1");
+    expect(dependentRepo!.repo).toBe("fetch-github-dependents-test");
+    expect(dependentRepo!.getUrl()).toBe(
       "https://github.com/ilimic1/fetch-github-dependents-test"
     );
-    expect(dependentRepo.stars).toBeGreaterThanOrEqual(1);
+    expect(dependentRepo!.stars).toBeGreaterThanOrEqual(1);
   },
   1 * 60 * 1000
 );
@@ -70,11 +72,11 @@ test(
 
     // console.log(`Fetching dependents for ${repo} ...`);
 
-    const { repos, count } = await getRepos(
-      `${repo}/network/dependents`,
+    const { repos, count } = await getRepos({
+      url: `${repo}/network/dependents`,
       reposToScan,
-      sort
-    );
+      sort,
+    });
 
     expect(count).toBeGreaterThan(0);
     expect(repos.length).toBe(reposToScan);

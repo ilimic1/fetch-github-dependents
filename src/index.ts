@@ -1,7 +1,7 @@
 import axios from "axios";
 import { load } from "cheerio";
 
-class Repo {
+export class Repo {
   constructor(
     public readonly user: string,
     public readonly repo: string,
@@ -16,13 +16,17 @@ class Repo {
 export const githubUserSlugRegex = /^[A-Za-z0-9-]+$/i;
 export const githubRepoSlugRegex = /^[A-Za-z0-9-_\.]+$/;
 
-async function getData(
-  url: string,
-  reposToScan?: number
-): Promise<{ repos: Repo[]; count: number }> {
+async function getData({
+  url,
+  reposToScan,
+}: {
+  url: string;
+  reposToScan?: number;
+}): Promise<{ repos: Repo[]; count?: number }> {
   const repos: Repo[] = [];
-  let repoCount: number = undefined;
+  let repoCount: number | undefined = undefined;
   let delay = 0;
+  let nextUrl: string | undefined = url;
 
   do {
     await new Promise((resolve) => setTimeout(resolve, delay));
@@ -34,9 +38,14 @@ async function getData(
       const request = await axios.get(url);
       data = await request.data;
     } catch (error) {
-      if (error.response && error.response.status === 429) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.status === 429
+      ) {
         // if we get HTTP 429 Too Many Requests we should sleep for a while
-        console.log("error.response.status", error.response.status);
+
+        // console.log("error.response.status", error.response.status);
         // console.log("error.response.headers", error.response.headers);
 
         if (
@@ -58,7 +67,11 @@ async function getData(
         continue;
       }
 
-      console.log("error.message", error.message);
+      console.log(
+        "error.message",
+        error instanceof Error ? error.message : error
+      );
+
       return { repos, count: repoCount };
     }
 
@@ -108,19 +121,23 @@ async function getData(
       '.paginate-container .btn.BtnGroup-item:contains("Next")'
     ).eq(0);
 
-    url = nextLink.length ? nextLink.attr("href") : null;
+    nextUrl = nextLink.length ? nextLink.attr("href") : undefined;
     console.log(`Went through ${repos.length}/${repoCount} repos...`);
-  } while (url);
+  } while (nextUrl);
 
   return { repos, count: repoCount };
 }
 
-export async function getRepos(
-  url: string,
-  reposToScan: number = undefined,
-  sort: undefined | "asc" | "desc"
-): Promise<{ repos: Repo[]; count: number }> {
-  const { repos, count } = await getData(url, reposToScan);
+export async function getRepos({
+  url,
+  reposToScan,
+  sort,
+}: {
+  url: string;
+  reposToScan?: number;
+  sort?: "asc" | "desc";
+}): Promise<{ repos: Repo[]; count?: number }> {
+  const { repos, count } = await getData({ url, reposToScan });
 
   // todo: sort by name as tie braker
   if (sort === "desc") {
