@@ -1,3 +1,4 @@
+import { countBy } from "lodash-es";
 import { expect, test } from "vitest";
 import {
   Logger,
@@ -95,6 +96,13 @@ test(
       expect(repo.repo).not.toBe("");
       expect(repo.repo).toMatch(githubRepoSlugRegex);
     });
+
+    // make sure there are no duplicates
+    const duplicateRepos = Object.entries(
+      countBy(repos, (repo) => repo.getUrl().toLowerCase())
+    ).filter(([, count]) => count > 1);
+
+    expect(duplicateRepos).toStrictEqual([]);
   },
   5 * 60 * 1000
 );
