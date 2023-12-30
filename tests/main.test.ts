@@ -1,10 +1,15 @@
 import { expect, test } from "vitest";
 import {
+  Logger,
   Repo,
   getRepos,
   githubRepoSlugRegex,
   githubUserSlugRegex,
 } from "../src/index.js";
+
+const logger: Logger = (level, data) => {
+  console.log(level.toUpperCase(), data);
+};
 
 test(
   "Test a repo with no dependents",
@@ -19,6 +24,7 @@ test(
       url: `${repo}/network/dependents`,
       reposToScan,
       sort,
+      logger,
     });
 
     expect(count).toBe(0);
@@ -40,6 +46,7 @@ test(
       url: `${repo}/network/dependents`,
       reposToScan,
       sort,
+      logger,
     });
 
     expect(count).toBeGreaterThanOrEqual(1);
@@ -76,6 +83,7 @@ test(
       url: `${repo}/network/dependents`,
       reposToScan,
       sort,
+      logger,
     });
 
     expect(count).toBeGreaterThan(0);

@@ -16,12 +16,19 @@ export class Repo {
 export const githubUserSlugRegex = /^[A-Za-z0-9-]+$/i;
 export const githubRepoSlugRegex = /^[A-Za-z0-9-_\.]+$/;
 
+export type Logger = (
+  level: "error" | "warn" | "info" | "debug",
+  data: any
+) => void;
+
 async function getData({
   url,
   reposToScan,
+  log,
 }: {
   url: string;
   reposToScan?: number;
+  log: Logger;
 }): Promise<{ repos: Repo[]; count?: number }> {
   const repos: Repo[] = [];
   let repoCount: number | undefined = undefined;
@@ -35,7 +42,7 @@ async function getData({
     let data: string;
 
     try {
-      const request = await axios.get(url);
+      const request = await axios.get(nextUrl);
       data = await request.data;
     } catch (error) {
       if (
@@ -45,8 +52,11 @@ async function getData({
       ) {
         // if we get HTTP 429 Too Many Requests we should sleep for a while
 
-        // console.log("error.response.status", error.response.status);
-        // console.log("error.response.headers", error.response.headers);
+        log("debug", "error.response.status");
+        log("debug", error.response.status);
+
+        log("debug", "error.response.headers");
+        log("debug", error.response.headers);
 
         if (
           error.response.headers["retry-after"] &&
@@ -58,7 +68,8 @@ async function getData({
           delay = 5 * 60 * 1000;
         }
 
-        console.log(
+        log(
+          "info",
           `Got HTTP 429 Too Many Requests, sleeping for ${
             delay / 1000
           } seconds...`
@@ -67,10 +78,8 @@ async function getData({
         continue;
       }
 
-      console.log(
-        "error.message",
-        error instanceof Error ? error.message : error
-      );
+      log("error", error instanceof Error ? error.message : error);
+      log("debug", error);
 
       return { repos, count: repoCount };
     }
@@ -104,15 +113,13 @@ async function getData({
       const stars = $(row).find("svg.octicon-star").parent().text();
 
       if (user === "" || repo === "") {
-        console.error(
-          `Failed to get user and/or repo for repo ${user}/${repo}.`
-        );
+        log("warn", `Failed to get user and/or repo for repo ${user}/${repo}.`);
       }
 
       repos.push(new Repo(user, repo, Number(stars)));
 
       if (reposToScan !== undefined && repos.length >= reposToScan) {
-        console.log(`Went through ${repos.length}/${repoCount} repos...`);
+        log("info", `Went through ${repos.length}/${repoCount} repos...`);
         return { repos, count: repoCount };
       }
     }
@@ -122,7 +129,7 @@ async function getData({
     ).eq(0);
 
     nextUrl = nextLink.length ? nextLink.attr("href") : undefined;
-    console.log(`Went through ${repos.length}/${repoCount} repos...`);
+    log("info", `Went through ${repos.length}/${repoCount} repos...`);
   } while (nextUrl);
 
   return { repos, count: repoCount };
@@ -132,12 +139,20 @@ export async function getRepos({
   url,
   reposToScan,
   sort,
+  logger,
 }: {
   url: string;
   reposToScan?: number;
   sort?: "asc" | "desc";
+  logger?: Logger;
 }): Promise<{ repos: Repo[]; count?: number }> {
-  const { repos, count } = await getData({ url, reposToScan });
+  const log: Logger = (level, data) => {
+    typeof logger === "function" && logger.call(null, level, data);
+  };
+
+  log("debug", arguments);
+
+  const { repos, count } = await getData({ url, reposToScan, log });
 
   // todo: sort by name as tie braker
   if (sort === "desc") {

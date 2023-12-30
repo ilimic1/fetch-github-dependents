@@ -3,7 +3,12 @@
 import { Command, InvalidArgumentError, Option } from "commander";
 import { trimEnd } from "lodash-es";
 import { version } from "../package.json";
-import { getRepos, githubRepoSlugRegex, githubUserSlugRegex } from "./index.js";
+import {
+  Logger,
+  getRepos,
+  githubRepoSlugRegex,
+  githubUserSlugRegex,
+} from "./index.js";
 
 const program = new Command();
 
@@ -54,8 +59,19 @@ program
       .default("desc")
   )
   .option("--no-sort", "disable default sorting by stars")
+  .option("-d, --debug", "output debugging")
   .action(async (repo, options) => {
-    console.log(`Fetching dependents for ${repo} ...`);
+    const debug = !!options.debug;
+
+    const log: Logger = (level, data) => {
+      if (!debug && level === "debug") {
+        return;
+      }
+      console.log(level.toUpperCase(), data);
+    };
+
+    log("debug", options);
+    log("info", `Fetching dependents for ${repo} ...`);
 
     const max = options.max ? parseInt(options.max) : undefined;
 
@@ -74,6 +90,7 @@ program
       url: `${repo}/network/dependents`,
       reposToScan: max,
       sort,
+      logger: log,
     });
 
     repos.forEach((repo) => {
